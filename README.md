@@ -1,4 +1,4 @@
-# Advanced LeanIX Data Analyzer
+# Data Analyzer
 
 A comprehensive tool for enterprise architecture analysis.
 
@@ -87,26 +87,3 @@ This project analyzes LeanIX enterprise architecture data to provide insights in
 - streamlit==1.47.1
 - numpy==2.3.2
 - seaborn==0.13.2
-
-## Quick Start
-
-1. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Run analysis**:
-   ```bash
-   cd main
-   python leanix_analyzer.py
-   ```
-
-3. **Start web app**:
-   ```bash
-   streamlit run streamlit_app.py
-   ```
-
-4. **Run tests**:
-   ```bash
-   python test.py
-   ```
