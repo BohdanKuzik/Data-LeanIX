@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
+import plotly.graph_objects as go
+import plotly.express as px
 from datetime import datetime
 
 st.set_page_config(
@@ -283,12 +284,22 @@ def show_visualization(df):
     
     if viz_type == "Cost Distribution":
         if 'Maintenance_Cost' in df.columns and 'Development_Cost' in df.columns:
-            fig, ax = plt.subplots(figsize=(6, 4))
-            ax.hist(df['Maintenance_Cost'], bins=8, alpha=0.7, color='lightblue', edgecolor='black')
-            plt.title('Maintenance Cost Distribution')
-            plt.xlabel('Cost ($)')
-            plt.ylabel('Number of Applications')
-            st.pyplot(fig)
+            fig = go.Figure()
+            fig.add_trace(go.Histogram(
+                x=df['Maintenance_Cost'],
+                nbinsx=8,
+                name='Maintenance Cost',
+                marker_color='lightblue',
+                opacity=0.7
+            ))
+            fig.update_layout(
+                title='Maintenance Cost Distribution',
+                xaxis_title='Cost ($)',
+                yaxis_title='Number of Applications',
+                template='plotly_white',
+                height=400
+            )
+            st.plotly_chart(fig, use_container_width=True)
     
     elif viz_type == "Correlation Matrix":
         numeric_cols = ['Maintenance_Cost', 'Development_Cost', 'Performance_Score', 'Security_Score']
@@ -297,23 +308,48 @@ def show_visualization(df):
         if len(available_cols) >= 2:
             numeric_df = df[available_cols].dropna()
             if len(numeric_df) > 0:
-                fig, ax = plt.subplots(figsize=(4, 3))
                 correlation_matrix = numeric_df.corr()
-                sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', center=0, 
-                           square=True, linewidths=0.5, ax=ax, fmt='.2f')
-                plt.title('Correlation Matrix')
-                st.pyplot(fig)
+                
+                fig = go.Figure(data=go.Heatmap(
+                    z=correlation_matrix.values,
+                    x=correlation_matrix.columns,
+                    y=correlation_matrix.columns,
+                    colorscale='RdBu',
+                    zmid=0,
+                    text=correlation_matrix.round(2).values,
+                    texttemplate="%{text}",
+                    textfont={"size": 10},
+                    hoverongaps=False
+                ))
+                
+                fig.update_layout(
+                    title='Correlation Matrix',
+                    template='plotly_white',
+                    height=400
+                )
+                st.plotly_chart(fig, use_container_width=True)
     
     elif viz_type == "Department Analysis":
         if 'Owner_Department' in df.columns:
-            fig, ax = plt.subplots(figsize=(6, 4))
             dept_counts = df['Owner_Department'].value_counts()
-            dept_counts.plot(kind='bar', color='lightcoral', ax=ax)
-            plt.title('Applications by Department')
-            plt.xlabel('Department')
-            plt.ylabel('Number of Applications')
-            plt.xticks(rotation=45)
-            st.pyplot(fig)
+            
+            fig = go.Figure(data=go.Bar(
+                x=dept_counts.index,
+                y=dept_counts.values,
+                marker_color='lightcoral',
+                text=dept_counts.values,
+                textposition='auto'
+            ))
+            
+            fig.update_layout(
+                title='Applications by Department',
+                xaxis_title='Department',
+                yaxis_title='Number of Applications',
+                template='plotly_white',
+                height=400,
+                xaxis_tickangle=-45
+            )
+            st.plotly_chart(fig, use_container_width=True)
 
 def show_report(df):
     st.header("Comprehensive Analysis Report")

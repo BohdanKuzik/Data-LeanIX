@@ -2,7 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
-import seaborn as sns
+import plotly.graph_objects as go
+import plotly.express as px
+from plotly.subplots import make_subplots
 
 class LeanIXAnalyzer:
     def __init__(self, file_path):
@@ -14,120 +16,21 @@ class LeanIXAnalyzer:
         try:
             self.df = pd.read_excel(self.file_path)
             print(f"Data loaded successfully!")
-            print(f"Records: {len(self.df):,}")
-            print(f"Columns: {len(self.df.columns)}")
-            print(f"Column names: {list(self.df.columns)}")
         except Exception as e:
             print(f"Error loading data: {e}")
     
     def basic_data_info(self):
-        print("\n" + "="*50)
         print("BASIC DATA INFORMATION")
-        print("="*50)
-        
+
         print(f"Total records: {len(self.df):,}")
         print(f"Total columns: {len(self.df.columns)}")
         print(f"Missing values: {self.df.isnull().sum().sum():,}")
         print(f"Duplicate records: {self.df.duplicated().sum():,}")
-        
-        print(f"\nData types:")
-        for dtype, count in self.df.dtypes.value_counts().items():
-            print(f"  {dtype}: {count} columns")
-    
-    def missing_data_analysis(self):
-        print("\n" + "="*50)
-        print("MISSING DATA ANALYSIS")
-        print("="*50)
-        
-        missing_data = self.df.isnull().sum()
-        
-        if missing_data.sum() == 0:
-            print("No missing data found!")
-        else:
-            print("Missing data by columns:")
-            for col, missing_count in missing_data.items():
-                if missing_count > 0:
-                    missing_percent = (missing_count / len(self.df)) * 100
-                    print(f"  {col}: {missing_count} ({missing_percent:.1f}%)")
-    
-    def data_quality_score(self):
-        print("\n" + "="*50)
-        print("DATA QUALITY SCORE")
-        print("="*50)
-        
-        total_cells = len(self.df) * len(self.df.columns)
-        missing_cells = self.df.isnull().sum().sum()
-        completeness = ((total_cells - missing_cells) / total_cells) * 100
-        
-        consistency_score = self.calculate_consistency_score()
-        accuracy_score = self.calculate_accuracy_score()
-        
-        overall_quality = (completeness + consistency_score + accuracy_score) / 3
-        
-        print(f"Data completeness: {completeness:.1f}%")
-        print(f"Data consistency: {consistency_score:.1f}%")
-        print(f"Data accuracy: {accuracy_score:.1f}%")
-        print(f"Overall quality score: {overall_quality:.1f}%")
-        print(f"Total cells: {total_cells:,}")
-        print(f"Missing cells: {missing_cells:,}")
-        
-        if overall_quality >= 90:
-            quality_level = "Excellent"
-        elif overall_quality >= 80:
-            quality_level = "Good"
-        elif overall_quality >= 70:
-            quality_level = "Satisfactory"
-        else:
-            quality_level = "Needs Improvement"
-        
-        print(f"Quality level: {quality_level}")
-    
-    def calculate_consistency_score(self):
-        score = 100
-        
-        numeric_cols = self.df.select_dtypes(include=[np.number]).columns
-        for col in numeric_cols:
-            if col in ['Maintenance_Cost', 'Development_Cost', 'User_Count', 'Data_Volume_GB']:
-                negative_count = (self.df[col] < 0).sum()
-                if negative_count > 0:
-                    score -= (negative_count / len(self.df)) * 10
-        
-        if 'Last_Updated' in self.df.columns:
-            try:
-                self.df['Last_Updated'] = pd.to_datetime(self.df['Last_Updated'])
-                future_dates = (self.df['Last_Updated'] > datetime.now()).sum()
-                if future_dates > 0:
-                    score -= (future_dates / len(self.df)) * 10
-            except:
-                score -= 5
-        
-        return max(score, 0)
-    
-    def calculate_accuracy_score(self):
-        score = 100
-        
-        numeric_cols = self.df.select_dtypes(include=[np.number]).columns
-        for col in numeric_cols:
-            if col in ['Performance_Score', 'Security_Score', 'Availability_Percentage']:
-                if col == 'Performance_Score':
-                    invalid_count = ((self.df[col] < 0) | (self.df[col] > 100)).sum()
-                elif col == 'Security_Score':
-                    invalid_count = ((self.df[col] < 0) | (self.df[col] > 100)).sum()
-                elif col == 'Availability_Percentage':
-                    invalid_count = ((self.df[col] < 0) | (self.df[col] > 100)).sum()
-                else:
-                    continue
-                
-                if invalid_count > 0:
-                    score -= (invalid_count / len(self.df)) * 10
-        
-        return max(score, 0)
     
     def business_analysis(self):
         print("\n" + "="*50)
         print("BUSINESS ANALYSIS")
-        print("="*50)
-        
+
         if 'Business_Criticality' in self.df.columns:
             criticality_dist = self.df['Business_Criticality'].value_counts()
             print("Application criticality distribution:")
@@ -161,8 +64,7 @@ class LeanIXAnalyzer:
     def security_compliance_analysis(self):
         print("\n" + "="*50)
         print("SECURITY AND COMPLIANCE ANALYSIS")
-        print("="*50)
-        
+
         if 'Compliance_Status' in self.df.columns:
             compliance_dist = self.df['Compliance_Status'].value_counts()
             non_compliant = compliance_dist.get('Non-Compliant', 0)
@@ -187,78 +89,101 @@ class LeanIXAnalyzer:
             print(f"  Average number of vulnerabilities: {avg_vulnerabilities:.1f}")
             print(f"  Applications with high vulnerability count (>5): {high_vulnerability}")
     
-    def performance_analysis(self):
-        print("\n" + "="*50)
-        print("PERFORMANCE ANALYSIS")
-        print("="*50)
-        
-        if 'Performance_Score' in self.df.columns:
-            low_performance = (self.df['Performance_Score'] < 70).sum()
-            avg_performance = self.df['Performance_Score'].mean()
-            print(f"Performance analysis:")
-            print(f"  Average performance score: {avg_performance:.1f}/100")
-            print(f"  Applications with low performance (<70): {low_performance}")
-            print(f"  Percentage of low performance applications: {(low_performance/len(self.df))*100:.1f}%")
-        
-        if 'Availability_Percentage' in self.df.columns:
-            low_availability = (self.df['Availability_Percentage'] < 99).sum()
-            avg_availability = self.df['Availability_Percentage'].mean()
-            print(f"\nAvailability analysis:")
-            print(f"  Average availability: {avg_availability:.2f}%")
-            print(f"  Applications with low availability (<99%): {low_availability}")
-    
     def create_advanced_charts(self):
         print("\n" + "="*50)
         print("CREATING CHARTS")
-        print("="*50)
-        
-        plt.style.use('default')
-        
-        # Small cost distribution chart
+
         if 'Maintenance_Cost' in self.df.columns and 'Development_Cost' in self.df.columns:
-            plt.figure(figsize=(6, 4))
-            plt.hist(self.df['Maintenance_Cost'], bins=8, alpha=0.7, color='lightblue', edgecolor='black')
-            plt.title('Maintenance Cost Distribution')
-            plt.xlabel('Cost ($)')
-            plt.ylabel('Number of Applications')
-            plt.tight_layout()
-            plt.savefig('cost_distribution.png', dpi=150, bbox_inches='tight')
-            print("Cost distribution chart saved as 'cost_distribution.png'")
+            fig = go.Figure()
+            fig.add_trace(go.Histogram(
+                x=self.df['Maintenance_Cost'],
+                nbinsx=8,
+                name='Maintenance Cost',
+                marker_color='lightblue',
+                opacity=0.7
+            ))
+            fig.update_layout(
+                title='Maintenance Cost Distribution',
+                xaxis_title='Cost ($)',
+                yaxis_title='Number of Applications',
+                template='plotly_white',
+                width=600,
+                height=400
+            )
+            fig.write_html('cost_distribution.html')
+            try:
+                fig.write_image('cost_distribution.png', width=600, height=400)
+                print("Cost distribution chart saved as 'cost_distribution.html' and 'cost_distribution.png'")
+            except Exception as e:
+                print(f"Warning: Could not save PNG file: {e}")
+                print("Cost distribution chart saved as 'cost_distribution.html' only")
         
-        # Small correlation matrix
         numeric_cols = ['Maintenance_Cost', 'Development_Cost', 'Performance_Score', 'Security_Score']
         available_cols = [col for col in numeric_cols if col in self.df.columns]
         
         if len(available_cols) >= 2:
             numeric_df = self.df[available_cols].dropna()
             if len(numeric_df) > 0:
-                plt.figure(figsize=(4, 3))
                 correlation_matrix = numeric_df.corr()
-                sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', center=0, 
-                           square=True, linewidths=0.5, fmt='.2f')
-                plt.title('Correlation Matrix')
-                plt.tight_layout()
-                plt.savefig('correlation_matrix.png', dpi=150, bbox_inches='tight')
-                print("Correlation matrix saved as 'correlation_matrix.png'")
+                
+                fig = go.Figure(data=go.Heatmap(
+                    z=correlation_matrix.values,
+                    x=correlation_matrix.columns,
+                    y=correlation_matrix.columns,
+                    colorscale='RdBu',
+                    zmid=0,
+                    text=correlation_matrix.round(2).values,
+                    texttemplate="%{text}",
+                    textfont={"size": 10},
+                    hoverongaps=False
+                ))
+                
+                fig.update_layout(
+                    title='Correlation Matrix',
+                    template='plotly_white',
+                    width=500,
+                    height=400
+                )
+                fig.write_html('correlation_matrix.html')
+                try:
+                    fig.write_image('correlation_matrix.png', width=500, height=400)
+                    print("Correlation matrix saved as 'correlation_matrix.html' and 'correlation_matrix.png'")
+                except Exception as e:
+                    print(f"Warning: Could not save PNG file: {e}")
+                    print("Correlation matrix saved as 'correlation_matrix.html' only")
         
-        # Small department analysis
         if 'Owner_Department' in self.df.columns:
-            plt.figure(figsize=(6, 4))
             dept_counts = self.df['Owner_Department'].value_counts()
-            dept_counts.plot(kind='bar', color='lightcoral')
-            plt.title('Applications by Department')
-            plt.xlabel('Department')
-            plt.ylabel('Number of Applications')
-            plt.xticks(rotation=45)
-            plt.tight_layout()
-            plt.savefig('department_analysis.png', dpi=150, bbox_inches='tight')
-            print("Department analysis saved as 'department_analysis.png'")
+            
+            fig = go.Figure(data=go.Bar(
+                x=dept_counts.index,
+                y=dept_counts.values,
+                marker_color='lightcoral',
+                text=dept_counts.values,
+                textposition='auto'
+            ))
+            
+            fig.update_layout(
+                title='Applications by Department',
+                xaxis_title='Department',
+                yaxis_title='Number of Applications',
+                template='plotly_white',
+                width=600,
+                height=400,
+                xaxis_tickangle=-45
+            )
+            fig.write_html('department_analysis.html')
+            try:
+                fig.write_image('department_analysis.png', width=600, height=400)
+                print("Department analysis saved as 'department_analysis.html' and 'department_analysis.png'")
+            except Exception as e:
+                print(f"Warning: Could not save PNG file: {e}")
+                print("Department analysis saved as 'department_analysis.html' only")
     
     def generate_comprehensive_report(self):
         print("\n" + "="*50)
         print("GENERATING COMPREHENSIVE REPORT")
-        print("="*50)
-        
+
         total_records = len(self.df)
         total_columns = len(self.df.columns)
         missing_values = self.df.isnull().sum().sum()
@@ -270,26 +195,25 @@ class LeanIXAnalyzer:
         avg_performance_score = self.df['Performance_Score'].mean() if 'Performance_Score' in self.df.columns else 0
         
         report = f"""
-COMPREHENSIVE LEANIX DATA ANALYSIS REPORT
-{'='*60}
-
-Analysis Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-MAIN METRICS:
-Total records: {total_records:,}
-Total columns: {total_columns}
-Missing values: {missing_values:,}
-Data completeness: {completeness:.1f}%
-
-BUSINESS METRICS:
-Total maintenance costs: ${total_maintenance_cost:,.2f}
-Total development costs: ${total_development_cost:,.2f}
-Total costs: ${total_maintenance_cost + total_development_cost:,.2f}
-Average security score: {avg_security_score:.1f}/100
-Average performance score: {avg_performance_score:.1f}/100
-
-COLUMN ANALYSIS:
-"""
+            COMPREHENSIVE LEANIX DATA ANALYSIS REPORT
+            
+            Analysis Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+            
+            MAIN METRICS:
+            Total records: {total_records:,}
+            Total columns: {total_columns}
+            Missing values: {missing_values:,}
+            Data completeness: {completeness:.1f}%
+            
+            BUSINESS METRICS:
+            Total maintenance costs: ${total_maintenance_cost:,.2f}
+            Total development costs: ${total_development_cost:,.2f}
+            Total costs: ${total_maintenance_cost + total_development_cost:,.2f}
+            Average security score: {avg_security_score:.1f}/100
+            Average performance score: {avg_performance_score:.1f}/100
+            
+            COLUMN ANALYSIS:
+        """
         
         for col in self.df.columns:
             missing_count = self.df[col].isnull().sum()
@@ -311,46 +235,38 @@ COLUMN ANALYSIS:
             report += f"Percentage of high-risk applications: {(high_critical_risk/total_records)*100:.1f}%\n"
         
         report += f"""
-
-RECOMMENDATIONS:
-1. Check columns with high percentage of missing data
-2. Establish rules for filling mandatory fields
-3. Regularly monitor data quality
-4. Create data cleaning process
-5. Improve security of applications with low scores
-6. Optimize performance of problematic applications
-7. Develop risk reduction plan for high-risk applications
-
-Created: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
+            RECOMMENDATIONS:
+            1. Check columns with high percentage of missing data
+            2. Establish rules for filling mandatory fields
+            3. Regularly monitor data quality
+            4. Create data cleaning process
+            5. Improve security of applications with low scores
+            6. Optimize performance of problematic applications
+            7. Develop risk reduction plan for high-risk applications
+            
+            Created: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+        """
         
         with open('comprehensive_analysis_report.txt', 'w', encoding='utf-8') as f:
             f.write(report)
         
         print("Comprehensive report saved as 'comprehensive_analysis_report.txt'")
-        print("\nREPORT CONTENT:")
-        print(report)
-    
+
     def run_analysis(self):
         print("RUNNING ADVANCED LEANIX DATA ANALYSIS")
-        print("="*60)
-        
+
         self.basic_data_info()
-        self.missing_data_analysis()
-        self.data_quality_score()
         self.business_analysis()
         self.security_compliance_analysis()
-        self.performance_analysis()
         self.create_advanced_charts()
         self.generate_comprehensive_report()
         
         print("\n" + "="*60)
         print("ANALYSIS COMPLETED!")
-        print("="*60)
         print("Created files:")
-        print("  cost_distribution.png")
-        print("  correlation_matrix.png")
-        print("  department_analysis.png")
+        print("  cost_distribution.html & cost_distribution.png")
+        print("  correlation_matrix.html & correlation_matrix.png")
+        print("  department_analysis.html & department_analysis.png")
         print("  comprehensive_analysis_report.txt")
         print("\nThis analysis demonstrates:")
         print("  Data analysis skills")

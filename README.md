@@ -16,7 +16,7 @@ This project analyzes LeanIX enterprise architecture data to provide insights in
 - **Business Intelligence**: Cost analysis, risk assessment, and KPI tracking
 - **Security & Compliance Analysis**: Security scoring and compliance monitoring
 - **Performance Optimization**: Performance metrics and availability analysis
-- **Advanced Visualizations**: Interactive charts and correlation analysis
+- **Advanced Visualizations**: Interactive Plotly charts and correlation analysis
 - **Comprehensive Reporting**: Detailed reports with actionable recommendations
 - **Web Application**: Interactive Streamlit dashboard for data exploration
 
@@ -72,9 +72,9 @@ This project analyzes LeanIX enterprise architecture data to provide insights in
 
 
 ### Generated Files
-- `cost_distribution.png` - Cost analysis visualizations
-- `correlation_matrix.png` - Correlation analysis heatmap
-- `department_analysis.png` - Department performance metrics
+- `cost_distribution.html` & `cost_distribution.png` - Interactive cost analysis visualizations
+- `correlation_matrix.html` & `correlation_matrix.png` - Interactive correlation analysis heatmap
+- `department_analysis.html` & `department_analysis.png` - Interactive department performance metrics
 - `comprehensive_analysis_report.txt` - Detailed analysis report
 
 
@@ -86,4 +86,4 @@ This project analyzes LeanIX enterprise architecture data to provide insights in
 - matplotlib==3.10.5
 - streamlit==1.47.1
 - numpy==2.3.2
-- seaborn==0.13.2
+- plotly==5.17.0
