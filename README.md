@@ -87,3 +87,29 @@ This project analyzes LeanIX enterprise architecture data to provide insights in
 - streamlit==1.47.1
 - numpy==2.3.2
 - plotly==5.17.0
+
+
+## Demo
+Application Criticality: Most apps (32%) are medium importance, with 50% being high/critical - good business focus.
+
+![](main/img/img.png)
+
+Risk Analysis: 36% of applications have high/critical risk - significant security concerns need attention.
+
+![](main/img/img_1.png)
+
+Performance: Average score 85.0/100 shows good overall performance, but some apps need optimization.
+
+![](main/img/img_2.png)
+
+Department Analysis: Sales (18 apps) and HR (13 apps) have the most applications, showing heavy technology dependence for customer and employee management.
+
+![](main/img/img_4.png)
+
+Correlation Matrix: Weak relationships between metrics - security, performance, and costs are mostly independent of each other.
+
+![](main/img/img_5.png)
+
+Cost Distribution: Most apps are cheap to maintain (0-20k), but a few are very expensive (140k+) - cost efficiency varies.
+
+![](main/img/img_6.png)

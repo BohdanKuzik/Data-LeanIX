@@ -7,13 +7,12 @@ import plotly.express as px
 from datetime import datetime
 
 st.set_page_config(
-    page_title="Advanced LeanIX Analyzer",
+    page_title="LeanIX Analyzer",
     page_icon="📊",
     layout="wide"
 )
 
-st.title("Advanced LeanIX Data Analyzer")
-st.markdown("### Comprehensive tool for enterprise architecture analysis")
+st.title("LeanIX Data Analyzer")
 
 @st.cache_data
 def load_data():
@@ -352,8 +351,6 @@ def show_visualization(df):
             st.plotly_chart(fig, use_container_width=True)
 
 def show_report(df):
-    st.header("Comprehensive Analysis Report")
-    
     total_records = len(df)
     total_columns = len(df.columns)
     missing_values = df.isnull().sum().sum()
@@ -365,60 +362,24 @@ def show_report(df):
     avg_performance_score = df['Performance_Score'].mean() if 'Performance_Score' in df.columns else 0
     
     report = f"""
-# Comprehensive LeanIX Data Analysis Report
+        # Comprehensive LeanIX Data Analysis Report
+        
+        **Analysis Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+        
+        ## Main Metrics
+        - **Total records:** {total_records:,}
+        - **Total columns:** {total_columns}
+        - **Missing values:** {missing_values:,}
+        - **Data completeness:** {completeness:.1f}%
+        
+        ## Business Metrics
+        - **Total maintenance costs:** ${total_maintenance_cost:,.2f}
+        - **Total development costs:** ${total_development_cost:,.2f}
+        - **Total costs:** ${total_maintenance_cost + total_development_cost:,.2f}
+        - **Average security score:** {avg_security_score:.1f}/100
+        - **Average performance score:** {avg_performance_score:.1f}/100
+    """
 
-**Analysis Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-## Main Metrics
-- **Total records:** {total_records:,}
-- **Total columns:** {total_columns}
-- **Missing values:** {missing_values:,}
-- **Data completeness:** {completeness:.1f}%
-
-## Business Metrics
-- **Total maintenance costs:** ${total_maintenance_cost:,.2f}
-- **Total development costs:** ${total_development_cost:,.2f}
-- **Total costs:** ${total_maintenance_cost + total_development_cost:,.2f}
-- **Average security score:** {avg_security_score:.1f}/100
-- **Average performance score:** {avg_performance_score:.1f}/100
-
-## Column Analysis
-"""
-    
-    for col in df.columns:
-        missing_count = df[col].isnull().sum()
-        missing_percent = (missing_count / total_records) * 100
-        report += f"- **{col}:** {missing_count} missing ({missing_percent:.1f}%)\n"
-    
-    if 'Business_Criticality' in df.columns:
-        criticality_dist = df['Business_Criticality'].value_counts()
-        report += f"\n## Application Criticality Distribution\n"
-        for level, count in criticality_dist.items():
-            percentage = (count / total_records) * 100
-            report += f"- **{level}:** {count} ({percentage:.1f}%)\n"
-    
-    if 'Risk_Level' in df.columns:
-        risk_dist = df['Risk_Level'].value_counts()
-        high_critical_risk = risk_dist.get('High', 0) + risk_dist.get('Critical', 0)
-        report += f"\n## Risk Analysis\n"
-        report += f"- **Applications with high/critical risk:** {high_critical_risk}\n"
-        report += f"- **Percentage of high-risk applications:** {(high_critical_risk/total_records)*100:.1f}%\n"
-    
-    report += f"""
-
-## Recommendations
-1. Check columns with high percentage of missing data
-2. Establish rules for filling mandatory fields
-3. Regularly monitor data quality
-4. Create data cleaning process
-5. Improve security of applications with low scores
-6. Optimize performance of problematic applications
-7. Develop risk reduction plan for high-risk applications
-
----
-*Created: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*
-"""
-    
     st.markdown(report)
     
     st.download_button(

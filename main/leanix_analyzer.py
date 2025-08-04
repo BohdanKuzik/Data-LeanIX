@@ -61,34 +61,6 @@ class LeanIXAnalyzer:
             print(f"  Applications with high/critical risk: {high_critical_risk}")
             print(f"  Percentage of high-risk applications: {(high_critical_risk/len(self.df))*100:.1f}%")
     
-    def security_compliance_analysis(self):
-        print("\n" + "="*50)
-        print("SECURITY AND COMPLIANCE ANALYSIS")
-
-        if 'Compliance_Status' in self.df.columns:
-            compliance_dist = self.df['Compliance_Status'].value_counts()
-            non_compliant = compliance_dist.get('Non-Compliant', 0)
-            print(f"Compliance status:")
-            for status, count in compliance_dist.items():
-                percentage = (count / len(self.df)) * 100
-                print(f"  {status}: {count} ({percentage:.1f}%)")
-            print(f"  Non-compliant applications: {non_compliant}")
-        
-        if 'Security_Score' in self.df.columns:
-            low_security = (self.df['Security_Score'] < 80).sum()
-            avg_security = self.df['Security_Score'].mean()
-            print(f"\nSecurity analysis:")
-            print(f"  Average security score: {avg_security:.1f}/100")
-            print(f"  Applications with low security (<80): {low_security}")
-            print(f"  Percentage of low security applications: {(low_security/len(self.df))*100:.1f}%")
-        
-        if 'Vulnerability_Count' in self.df.columns:
-            high_vulnerability = (self.df['Vulnerability_Count'] > 5).sum()
-            avg_vulnerabilities = self.df['Vulnerability_Count'].mean()
-            print(f"\nVulnerability analysis:")
-            print(f"  Average number of vulnerabilities: {avg_vulnerabilities:.1f}")
-            print(f"  Applications with high vulnerability count (>5): {high_vulnerability}")
-    
     def create_advanced_charts(self):
         print("\n" + "="*50)
         print("CREATING CHARTS")
@@ -257,7 +229,6 @@ class LeanIXAnalyzer:
 
         self.basic_data_info()
         self.business_analysis()
-        self.security_compliance_analysis()
         self.create_advanced_charts()
         self.generate_comprehensive_report()
         
