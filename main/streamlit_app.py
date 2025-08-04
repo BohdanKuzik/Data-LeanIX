@@ -17,7 +17,7 @@ st.title("LeanIX Data Analyzer")
 @st.cache_data
 def load_data():
     try:
-        df = pd.read_excel("sources/sample_leanix_data.xlsx")
+        df = pd.read_excel("main/sources/sample_leanix_data.xlsx")
         return df
     except Exception as e:
         st.error(f"Error loading data: {e}")

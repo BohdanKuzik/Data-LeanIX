@@ -60,7 +60,7 @@ class LeanIXAnalyzer:
             print(f"\nRisk analysis:")
             print(f"  Applications with high/critical risk: {high_critical_risk}")
             print(f"  Percentage of high-risk applications: {(high_critical_risk/len(self.df))*100:.1f}%")
-    
+
     def create_advanced_charts(self):
         print("\n" + "="*50)
         print("CREATING CHARTS")
@@ -247,5 +247,5 @@ class LeanIXAnalyzer:
         print("  Generation of detailed reports")
 
 if __name__ == "__main__":
-    analyzer = LeanIXAnalyzer("sources/sample_leanix_data.xlsx")
+    analyzer = LeanIXAnalyzer("main/sources/sample_leanix_data.xlsx")
     analyzer.run_analysis()
